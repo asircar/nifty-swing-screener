@@ -12,7 +12,11 @@ from swing.analysis.indicators import compute_indicators
 from swing.analysis.levels import compute_levels
 from swing.analysis.scorer import compute_score, rank_candidates
 from swing.analysis.signals import detect_signals
-from swing.data.cache import clear_old_cache
+from swing.data.cache import (
+    clear_old_cache,
+    get_cached_results,
+    save_scan_results,
+)
 from swing.data.fetcher import fetch_ohlcv
 from swing.data.nifty500 import get_nifty500_stocks
 from swing.utils.logger import get_logger
@@ -32,9 +36,26 @@ async def index():
     return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
 
 
+@app.get("/api/results")
+async def results(scope: int = 500):
+    """Return cached scan results for today, or null if none exist."""
+    cached = get_cached_results(scope)
+    if cached:
+        return JSONResponse(cached)
+    return JSONResponse({"cached": False})
+
+
 @app.get("/api/scan")
-async def scan(max_stocks: int | None = None):
-    """Run the screener and return JSON results."""
+async def scan(max_stocks: int = 500):
+    """Run the screener and return JSON results. Caches results for the day."""
+    scope = max_stocks
+
+    # Check cache first
+    cached = get_cached_results(scope)
+    if cached:
+        return JSONResponse(cached)
+
+    # No cache — run fresh scan
     stocks = get_nifty500_stocks()
     if not stocks:
         return JSONResponse({"error": "Could not load stock list"}, status_code=500)
@@ -94,13 +115,18 @@ async def scan(max_stocks: int | None = None):
 
     candidates = rank_candidates(candidates)
 
-    return JSONResponse(
-        {
-            "candidates": candidates,
-            "stats": stats,
-            "count": len(candidates),
-        }
-    )
+    # Build response and cache it
+    response_data = {
+        "candidates": candidates,
+        "stats": stats,
+        "count": len(candidates),
+    }
+
+    scanned_at = save_scan_results(scope, response_data)
+    response_data["scanned_at"] = scanned_at
+    response_data["cached"] = False
+
+    return JSONResponse(response_data)
 
 
 @app.get("/api/health")

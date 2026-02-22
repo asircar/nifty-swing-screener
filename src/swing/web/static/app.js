@@ -5,6 +5,28 @@
 let allCandidates = [];
 let currentSort = { key: "score", ascending: false };
 
+// ── Auto-load cached results on page load ──
+document.addEventListener("DOMContentLoaded", loadCachedResults);
+
+async function loadCachedResults() {
+    const scopeSelect = document.getElementById("scanScope");
+    const scope = scopeSelect.value;
+
+    try {
+        const response = await fetch(`/api/results?scope=${scope}`);
+        if (!response.ok) return;
+        const data = await response.json();
+
+        if (data.cached && data.candidates) {
+            displayData(data);
+            const statusText = document.getElementById("statusText");
+            statusText.textContent = `${data.count} candidates · scanned at ${data.scanned_at}`;
+        }
+    } catch {
+        // Silently fail — user can click Scan Now manually
+    }
+}
+
 // ── Scan ──
 async function startScan() {
     const btn = document.getElementById("btnScan");
@@ -32,30 +54,13 @@ async function startScan() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const data = await response.json();
-        allCandidates = data.candidates || [];
+        displayData(data);
 
-        // Update stats
-        document.getElementById("statCandidates").textContent = data.count || 0;
-        document.getElementById("statScanned").textContent = data.stats?.scanned || 0;
-        document.getElementById("statFiltered").textContent = data.stats?.filtered || 0;
-
-        if (allCandidates.length > 0) {
-            const avgScore =
-                allCandidates.reduce((s, c) => s + c.score, 0) / allCandidates.length;
-            document.getElementById("statAvgScore").textContent = avgScore.toFixed(1);
+        if (data.cached) {
+            statusText.textContent = `${data.count} candidates · scanned at ${data.scanned_at}`;
         } else {
-            document.getElementById("statAvgScore").textContent = "—";
+            statusText.textContent = `${data.count} candidates found · scanned at ${data.scanned_at}`;
         }
-
-        // Populate industry filter
-        populateIndustryFilter();
-
-        // Render
-        renderResults(allCandidates);
-
-        statsBar.style.display = "grid";
-        results.style.display = "block";
-        statusText.textContent = `${data.count} candidates found`;
         pulse.classList.remove("scanning");
     } catch (err) {
         console.error("Scan failed:", err);
@@ -71,6 +76,38 @@ async function startScan() {
         scopeSelect.disabled = false;
         btn.innerHTML = '<span class="btn-icon">🔍</span><span>Scan Now</span>';
     }
+}
+
+// ── Display Data (shared by auto-load and scan) ──
+function displayData(data) {
+    const statsBar = document.getElementById("statsBar");
+    const results = document.getElementById("resultsSection");
+    const empty = document.getElementById("emptyState");
+
+    allCandidates = data.candidates || [];
+
+    // Update stats
+    document.getElementById("statCandidates").textContent = data.count || 0;
+    document.getElementById("statScanned").textContent = data.stats?.scanned || 0;
+    document.getElementById("statFiltered").textContent = data.stats?.filtered || 0;
+
+    if (allCandidates.length > 0) {
+        const avgScore =
+            allCandidates.reduce((s, c) => s + c.score, 0) / allCandidates.length;
+        document.getElementById("statAvgScore").textContent = avgScore.toFixed(1);
+    } else {
+        document.getElementById("statAvgScore").textContent = "—";
+    }
+
+    // Populate industry filter
+    populateIndustryFilter();
+
+    // Render
+    renderResults(allCandidates);
+
+    statsBar.style.display = "grid";
+    empty.style.display = "none";
+    results.style.display = "block";
 }
 
 // ── Render Results ──

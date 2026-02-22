@@ -1,9 +1,10 @@
-"""SQLite caching layer for OHLCV data."""
+"""SQLite caching layer for OHLCV data and scan results."""
 
 from __future__ import annotations
 
+import json
 import sqlite3
-from datetime import date
+from datetime import date, datetime
 
 import pandas as pd
 
@@ -23,6 +24,15 @@ def _get_conn() -> sqlite3.Connection:
             fetch_date TEXT NOT NULL,
             data_json TEXT NOT NULL,
             PRIMARY KEY (ticker, fetch_date)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS scan_results (
+            scan_date TEXT NOT NULL,
+            scope INTEGER NOT NULL,
+            results_json TEXT NOT NULL,
+            scanned_at TEXT NOT NULL,
+            PRIMARY KEY (scan_date, scope)
         )
     """)
     conn.commit()
@@ -74,8 +84,53 @@ def clear_old_cache(keep_days: int = 3) -> None:
     conn = _get_conn()
     try:
         conn.execute("DELETE FROM ohlcv_cache WHERE fetch_date < ?", (cutoff,))
+        conn.execute("DELETE FROM scan_results WHERE scan_date < ?", (cutoff,))
         conn.commit()
     except Exception as exc:
         log.warning("Failed to clear old cache: %s", exc)
     finally:
         conn.close()
+
+
+# ── Scan Results Cache ──
+
+def get_cached_results(scope: int) -> dict | None:
+    """Return cached scan results for today and given scope, or None."""
+    today = date.today().isoformat()
+    conn = _get_conn()
+    try:
+        row = conn.execute(
+            "SELECT results_json, scanned_at FROM scan_results "
+            "WHERE scan_date = ? AND scope = ?",
+            (today, scope),
+        ).fetchone()
+        if row is None:
+            return None
+        results = json.loads(row[0])
+        results["scanned_at"] = row[1]
+        results["cached"] = True
+        return results
+    except Exception:
+        return None
+    finally:
+        conn.close()
+
+
+def save_scan_results(scope: int, results: dict) -> str:
+    """Save scan results to cache. Returns the scanned_at timestamp."""
+    today = date.today().isoformat()
+    scanned_at = datetime.now().strftime("%I:%M %p")
+    conn = _get_conn()
+    try:
+        conn.execute(
+            """INSERT OR REPLACE INTO scan_results
+               (scan_date, scope, results_json, scanned_at)
+               VALUES (?, ?, ?, ?)""",
+            (today, scope, json.dumps(results), scanned_at),
+        )
+        conn.commit()
+    except Exception as exc:
+        log.warning("Failed to cache scan results: %s", exc)
+    finally:
+        conn.close()
+    return scanned_at
