@@ -53,7 +53,7 @@ src/swing/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/nifty-swing-screener.git
+git clone https://github.com/asircar/nifty-swing-screener.git
 cd nifty-swing-screener
 
 # Install with uv
