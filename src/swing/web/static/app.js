@@ -5,6 +5,12 @@
 let allCandidates = [];
 let currentSort = { key: "score", ascending: false };
 
+// ── Helpers ──
+function formatTime(utcIso) {
+    const d = new Date(utcIso);
+    return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
 // ── Auto-load cached results on page load ──
 document.addEventListener("DOMContentLoaded", loadCachedResults);
 
@@ -20,7 +26,7 @@ async function loadCachedResults() {
         if (data.cached && data.candidates) {
             displayData(data);
             const statusText = document.getElementById("statusText");
-            statusText.textContent = `${data.count} candidates · scanned at ${data.scanned_at}`;
+            statusText.textContent = `${data.count} candidates · scanned at ${formatTime(data.scanned_at)}`;
         }
     } catch {
         // Silently fail — user can click Scan Now manually
@@ -57,9 +63,9 @@ async function startScan() {
         displayData(data);
 
         if (data.cached) {
-            statusText.textContent = `${data.count} candidates · scanned at ${data.scanned_at}`;
+            statusText.textContent = `${data.count} candidates · scanned at ${formatTime(data.scanned_at)}`;
         } else {
-            statusText.textContent = `${data.count} candidates found · scanned at ${data.scanned_at}`;
+            statusText.textContent = `${data.count} candidates found · scanned at ${formatTime(data.scanned_at)}`;
         }
         pulse.classList.remove("scanning");
     } catch (err) {

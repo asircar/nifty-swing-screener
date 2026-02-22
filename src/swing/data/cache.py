@@ -119,7 +119,7 @@ def get_cached_results(scope: int) -> dict | None:
 def save_scan_results(scope: int, results: dict) -> str:
     """Save scan results to cache. Returns the scanned_at timestamp."""
     today = date.today().isoformat()
-    scanned_at = datetime.now().strftime("%I:%M %p")
+    scanned_at = datetime.utcnow().isoformat() + "Z"
     conn = _get_conn()
     try:
         conn.execute(
