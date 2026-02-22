@@ -1,0 +1,28 @@
+[project]
+name = "nifty-swing-screener"
+version = "0.1.0"
+description = "Swing trading stock screener for Indian stock market (Nifty 500)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "yfinance>=0.2.36",
+    "pandas>=2.2.0",
+    "ta>=0.11.0",
+    "rich>=13.7.0",
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+swing = "swing.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/swing"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

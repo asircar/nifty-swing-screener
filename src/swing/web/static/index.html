@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swing Trade Screener — Nifty 500</title>
+    <meta name="description"
+        content="AI-powered swing trading stock screener for the Indian stock market. Scans Nifty 500 for opportunities.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">📊</span>
+                    <div>
+                        <h1>SwingScanner</h1>
+                        <p class="tagline">Nifty 500 Swing Trade Screener</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="status-badge" id="statusBadge">
+                        <span class="pulse"></span>
+                        <span id="statusText">Ready</span>
+                    </div>
+                    <select class="scope-select" id="scanScope">
+                        <option value="50">Nifty 50 · Large Cap · ~30s</option>
+                        <option value="100">Nifty 100 · Large + Mid · ~1 min</option>
+                        <option value="200">Nifty 200 · Top 200 · ~2 min</option>
+                        <option value="500" selected>Nifty 500 · Full Universe · ~5 min</option>
+                    </select>
+                    <button class="btn-scan" id="btnScan" onclick="startScan()">
+                        <span class="btn-icon">🔍</span>
+                        <span>Scan Now</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <section class="stats-bar" id="statsBar" style="display: none;">
+            <div class="stat-card">
+                <span class="stat-value" id="statCandidates">0</span>
+                <span class="stat-label">Candidates</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statScanned">0</span>
+                <span class="stat-label">Scanned</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statFiltered">0</span>
+                <span class="stat-label">Filtered</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statAvgScore">—</span>
+                <span class="stat-label">Avg Score</span>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section class="loading-section" id="loadingSection" style="display: none;">
+            <div class="loader">
+                <div class="loader-ring"></div>
+                <p class="loader-text">Scanning Nifty 500 stocks...</p>
+                <p class="loader-sub">This may take a few minutes on first run</p>
+            </div>
+        </section>
+
+        <!-- Empty State -->
+        <section class="empty-state" id="emptyState">
+            <div class="empty-content">
+                <div class="empty-icon">🎯</div>
+                <h2>Ready to Scan</h2>
+                <p>Click <strong>Scan Now</strong> to analyze Nifty 500 stocks for swing trading opportunities.</p>
+                <div class="features-grid">
+                    <div class="feature">
+                        <span class="feature-icon">📈</span>
+                        <span>EMA Alignment</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📊</span>
+                        <span>RSI Recovery</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🔀</span>
+                        <span>MACD Crossover</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🔄</span>
+                        <span>Support Bounce</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📢</span>
+                        <span>Volume Surge</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by symbol or company..."
+                    oninput="filterResults()">
+                <select class="filter-select" id="industryFilter" onchange="filterResults()">
+                    <option value="">All Industries</option>
+                </select>
+                <select class="filter-select" id="sortBy" onchange="sortResults()">
+                    <option value="score">Sort by Score</option>
+                    <option value="risk_reward">Sort by R:R</option>
+                    <option value="signal_count">Sort by Signals</option>
+                    <option value="close">Sort by Price</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper">
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th class="col-rank">#</th>
+                            <th class="col-symbol" onclick="toggleSort('symbol')">Symbol ↕</th>
+                            <th class="col-company">Company</th>
+                            <th class="col-industry">Industry</th>
+                            <th class="col-chart">Chart (30d)</th>
+                            <th class="col-score" onclick="toggleSort('score')">Score ↕</th>
+                            <th class="col-price" onclick="toggleSort('close')">CMP (₹) ↕</th>
+                            <th class="col-entry">Entry (₹)</th>
+                            <th class="col-sl">Stop Loss (₹)</th>
+                            <th class="col-target">Target (₹)</th>
+                            <th class="col-rr" onclick="toggleSort('risk_reward')">R:R ↕</th>
+                            <th class="col-signals">Signals</th>
+                            <th class="col-rsi">RSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>⚠️ This tool is for educational purposes only. Not financial advice. Always do your own research before
+                trading.</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
