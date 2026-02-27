@@ -18,7 +18,14 @@ from swing.data.cache import (
     save_scan_results,
 )
 from swing.data.fetcher import fetch_ohlcv
-from swing.data.nifty500 import get_nifty500_stocks
+from swing.config import MIN_PRICE, MIN_PRICE_US, WARMUP_DAYS
+from swing.data.nifty_indices import (
+    get_nifty100_stocks,
+    get_nifty200_stocks,
+    get_nifty50_stocks,
+    get_nifty500_stocks,
+)
+from swing.data.us_stocks import get_dow30_stocks, get_nasdaq100_stocks, get_sp500_stocks
 from swing.utils.logger import get_logger
 
 log = get_logger(__name__)
@@ -37,28 +44,46 @@ async def index():
 
 
 @app.get("/api/results")
-async def results(scope: int = 500):
+async def results(market: str = "nifty_500", scope: int = 500):
     """Return cached scan results for today, or null if none exist."""
-    cached = get_cached_results(scope)
+    cache_key = f"{market}_{scope}"
+    cached = get_cached_results(cache_key)
     if cached:
         return JSONResponse(cached)
     return JSONResponse({"cached": False})
 
 
 @app.get("/api/scan")
-async def scan(max_stocks: int = 500):
+async def scan(market: str = "nifty_500", max_stocks: int | None = None):
     """Run the screener and return JSON results. Caches results for the day."""
-    scope = max_stocks
+    scope = max_stocks if max_stocks else 500
 
-    # Check cache first
-    cached = get_cached_results(scope)
+    # Check cache first (per market)
+    cache_key = f"{market}_{scope}"
+    cached = get_cached_results(cache_key)
     if cached:
         return JSONResponse(cached)
 
+    market_fetchers = {
+        "nifty_50": get_nifty50_stocks,
+        "nifty_100": get_nifty100_stocks,
+        "nifty_200": get_nifty200_stocks,
+        "nifty_500": get_nifty500_stocks,
+        "dow_30": get_dow30_stocks,
+        "nasdaq_100": get_nasdaq100_stocks,
+        "sp_500": get_sp500_stocks,
+    }
+    
+    us_markets = {"dow_30", "nasdaq_100", "sp_500"}
+
+    fetcher = market_fetchers.get(market)
+    if not fetcher:
+        return JSONResponse({"error": f"Unknown market: {market}"}, status_code=400)
+
     # No cache — run fresh scan
-    stocks = get_nifty500_stocks()
+    stocks = fetcher()
     if not stocks:
-        return JSONResponse({"error": "Could not load stock list"}, status_code=500)
+        return JSONResponse({"error": f"Could not load stock list for {market}"}, status_code=500)
 
     if max_stocks:
         stocks = stocks[:max_stocks]
@@ -73,13 +98,14 @@ async def scan(max_stocks: int = 500):
         symbol = stock_info["symbol"]
 
         df = fetch_ohlcv(ticker)
-        if df is None or len(df) < 50:
+        if df is None or len(df) < WARMUP_DAYS:
             stats["skipped"] += 1
             stats["scanned"] += 1
             continue
 
         df = compute_indicators(df)
-        result = detect_signals(df)
+        min_price = MIN_PRICE_US if market in us_markets else MIN_PRICE
+        result = detect_signals(df, min_price=min_price)
 
         if not result.get("passed"):
             stats["filtered"] += 1
@@ -120,9 +146,10 @@ async def scan(max_stocks: int = 500):
         "candidates": candidates,
         "stats": stats,
         "count": len(candidates),
+        "market": market,
     }
 
-    scanned_at = save_scan_results(scope, response_data)
+    scanned_at = save_scan_results(cache_key, response_data)
     response_data["scanned_at"] = scanned_at
     response_data["cached"] = False
 

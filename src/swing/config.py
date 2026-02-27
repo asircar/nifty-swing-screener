@@ -7,8 +7,20 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 DB_PATH = DATA_DIR / "cache.db"
 FALLBACK_CSV = DATA_DIR / "nifty500_fallback.csv"
+NIFTY50_FALLBACK_CSV = DATA_DIR / "nifty50_fallback.csv"
+NIFTY100_FALLBACK_CSV = DATA_DIR / "nifty100_fallback.csv"
+NIFTY200_FALLBACK_CSV = DATA_DIR / "nifty200_fallback.csv"
 
 # ──────────────────────────── Data ─────────────────────────────
+NIFTY50_CSV_URL = (
+    "https://archives.nseindia.com/content/indices/ind_nifty50list.csv"
+)
+NIFTY100_CSV_URL = (
+    "https://archives.nseindia.com/content/indices/ind_nifty100list.csv"
+)
+NIFTY200_CSV_URL = (
+    "https://archives.nseindia.com/content/indices/ind_nifty200list.csv"
+)
 NIFTY500_CSV_URL = (
     "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
 )
@@ -33,7 +45,8 @@ SUPPORT_PROXIMITY_PCT = 0.02   # price within 2% of support
 VOLUME_SURGE_FACTOR = 1.5      # volume ≥ 1.5× average
 
 # ──────────────────────────── Filters ──────────────────────────
-MIN_PRICE = 50.0               # ₹50 minimum
+MIN_PRICE = 50.0               # ₹50 minimum (India)
+MIN_PRICE_US = 5.0             # $5 minimum (US)
 MIN_AVG_VOLUME = 100_000       # 100K shares/day
 
 # ──────────────────────────── Levels ───────────────────────────

@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", loadCachedResults);
 
 async function loadCachedResults() {
     const scopeSelect = document.getElementById("scanScope");
-    const scope = scopeSelect.value;
+    const market = scopeSelect.value;
 
     try {
-        const response = await fetch(`/api/results?scope=${scope}`);
+        const response = await fetch(`/api/results?market=${market}`);
         if (!response.ok) return;
         const data = await response.json();
 
@@ -43,7 +43,7 @@ async function startScan() {
     const pulse = document.querySelector(".pulse");
     const statusText = document.getElementById("statusText");
     const scopeSelect = document.getElementById("scanScope");
-    const maxStocks = scopeSelect.value;
+    const market = scopeSelect.value;
 
     btn.disabled = true;
     scopeSelect.disabled = true;
@@ -53,10 +53,10 @@ async function startScan() {
     results.style.display = "none";
     statsBar.style.display = "none";
     pulse.classList.add("scanning");
-    statusText.textContent = `Scanning top ${maxStocks} stocks...`;
+    statusText.textContent = `Scanning ${market.replace("_", " ")} stocks...`;
 
     try {
-        const response = await fetch(`/api/scan?max_stocks=${maxStocks}`);
+        const response = await fetch(`/api/scan?market=${market}`);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const data = await response.json();

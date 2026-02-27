@@ -16,7 +16,14 @@ from swing.analysis.scorer import compute_score, rank_candidates
 from swing.analysis.signals import detect_signals
 from swing.data.cache import clear_old_cache
 from swing.data.fetcher import fetch_ohlcv
-from swing.data.nifty500 import get_nifty500_stocks
+from swing.config import MIN_PRICE, MIN_PRICE_US
+from swing.data.nifty_indices import (
+    get_nifty100_stocks,
+    get_nifty200_stocks,
+    get_nifty50_stocks,
+    get_nifty500_stocks,
+)
+from swing.data.us_stocks import get_dow30_stocks, get_nasdaq100_stocks, get_sp500_stocks
 from swing.utils.logger import get_logger
 
 log = get_logger(__name__)
@@ -39,19 +46,37 @@ def _signal_icons(signals: dict) -> str:
     return " ".join(parts)
 
 
-def run_screener(max_stocks: int | None = None) -> list[dict]:
+def run_screener(market: str = "nifty_500", max_stocks: int | None = None) -> list[dict]:
     """Run the full screener pipeline and return ranked candidates."""
+    market_fetchers = {
+        "nifty_50": get_nifty50_stocks,
+        "nifty_100": get_nifty100_stocks,
+        "nifty_200": get_nifty200_stocks,
+        "nifty_500": get_nifty500_stocks,
+        "dow_30": get_dow30_stocks,
+        "nasdaq_100": get_nasdaq100_stocks,
+        "sp_500": get_sp500_stocks,
+    }
+    
+    us_markets = {"dow_30", "nasdaq_100", "sp_500"}
+
+    fetcher = market_fetchers.get(market)
+    if not fetcher:
+        console.print(f"[red]❌ Unknown market: {market}[/]")
+        console.print(f"[dim]Available: {', '.join(market_fetchers.keys())}[/]")
+        return []
+
     console.print(
         Panel(
-            "[bold cyan]🔍 Swing Trading Screener — Nifty 500[/]\n"
+            f"[bold cyan]🔍 Swing Trading Screener — {market}[/]\n"
             "[dim]Scanning for swing trade opportunities...[/]",
             border_style="cyan",
         )
     )
 
     # Step 1: Get stock list
-    console.print("\n[bold yellow]Step 1:[/] Fetching Nifty 500 stock list...")
-    stocks = get_nifty500_stocks()
+    console.print(f"\n[bold yellow]Step 1:[/] Fetching {market} stock list...")
+    stocks = fetcher()
     if not stocks:
         console.print("[red]❌ Could not load stock list. Exiting.[/]")
         return []
@@ -94,7 +119,8 @@ def run_screener(max_stocks: int | None = None) -> list[dict]:
             df = compute_indicators(df)
 
             # Detect signals
-            result = detect_signals(df)
+            min_price = MIN_PRICE_US if market in us_markets else MIN_PRICE
+            result = detect_signals(df, min_price=min_price)
 
             if not result.get("passed"):
                 if result.get("reason") == "filter_failed":
@@ -229,8 +255,14 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Swing Trading Screener for Nifty 500",
+        description="Swing Trading Screener — Multi-Market",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "-m", "--market",
+        type=str,
+        default="nifty_500",
+        help="Market to scan: nifty_50, nifty_100, nifty_200, nifty_500, dow_30, nasdaq_100, sp_500",
     )
     parser.add_argument(
         "-n", "--max-stocks",
@@ -251,7 +283,7 @@ def main():
         return
 
     start = time.time()
-    candidates = run_screener(max_stocks=args.max_stocks)
+    candidates = run_screener(market=args.market, max_stocks=args.max_stocks)
     display_results(candidates)
     elapsed = time.time() - start
     console.print(f"[dim]Completed in {elapsed:.1f}s[/]")
