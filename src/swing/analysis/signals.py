@@ -18,7 +18,7 @@ from swing.utils.logger import get_logger
 log = get_logger(__name__)
 
 
-def detect_signals(df: pd.DataFrame) -> dict:
+def detect_signals(df: pd.DataFrame, min_price: float = MIN_PRICE) -> dict:
     """Run all signal checks on an indicator-enriched DataFrame.
 
     Returns a dict with:
@@ -48,7 +48,7 @@ def detect_signals(df: pd.DataFrame) -> dict:
     price_above_200ema = bool(
         pd.notna(latest.get("EMA_200")) and latest["Close"] > latest["EMA_200"]
     )
-    price_min = bool(latest["Close"] >= MIN_PRICE)
+    price_min = bool(latest["Close"] >= min_price)
     volume_min = bool(
         pd.notna(latest.get("Volume_SMA"))
         and latest["Volume_SMA"] >= MIN_AVG_VOLUME
