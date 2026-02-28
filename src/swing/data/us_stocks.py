@@ -16,10 +16,7 @@ _WIKI_DOW30 = "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
 _WIKI_NASDAQ100 = "https://en.wikipedia.org/wiki/Nasdaq-100"
 
 _HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    )
+    "User-Agent": "SwingScreenerBot/1.0 (https://github.com/asircar/nifty-swing-screener)"
 }
 
 
