@@ -172,7 +172,7 @@ def run_screener(market: str = "nifty_500", max_stocks: int | None = None) -> li
     return candidates
 
 
-def display_results(candidates: list[dict]) -> None:
+def display_results(candidates: list[dict], currency: str = "₹") -> None:
     """Display results in a rich table."""
     if not candidates:
         console.print(
@@ -192,10 +192,10 @@ def display_results(candidates: list[dict]) -> None:
     table.add_column("Symbol", style="bold cyan", width=12)
     table.add_column("Company", width=20, overflow="ellipsis")
     table.add_column("Score", justify="center", width=7)
-    table.add_column("CMP (₹)", justify="right", width=10)
-    table.add_column("Entry (₹)", justify="right", width=10)
-    table.add_column("Stop Loss (₹)", justify="right", width=12)
-    table.add_column("Target (₹)", justify="right", width=10)
+    table.add_column(f"CMP ({currency})", justify="right", width=10)
+    table.add_column(f"Entry ({currency})", justify="right", width=10)
+    table.add_column(f"Stop Loss ({currency})", justify="right", width=12)
+    table.add_column(f"Target ({currency})", justify="right", width=10)
     table.add_column("R:R", justify="center", width=5)
     table.add_column("Signals", width=24)
     table.add_column("RSI", justify="center", width=6)
@@ -284,7 +284,11 @@ def main():
 
     start = time.time()
     candidates = run_screener(market=args.market, max_stocks=args.max_stocks)
-    display_results(candidates)
+    
+    us_markets = {"dow_30", "nasdaq_100", "sp_500"}
+    currency = "$" if args.market in us_markets else "₹"
+    
+    display_results(candidates, currency=currency)
     elapsed = time.time() - start
     console.print(f"[dim]Completed in {elapsed:.1f}s[/]")
 

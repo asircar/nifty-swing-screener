@@ -3,6 +3,7 @@
    ────────────────────────────────────────────────────────────── */
 
 let allCandidates = [];
+let currentCurrency = "₹";
 let currentSort = { key: "score", ascending: false };
 
 // ── Helpers ──
@@ -91,6 +92,13 @@ function displayData(data) {
     const empty = document.getElementById("emptyState");
 
     allCandidates = data.candidates || [];
+    currentCurrency = data.currency || "₹";
+
+    // Update table headers with currency
+    document.querySelector(".col-price").textContent = `CMP (${currentCurrency}) ↕`;
+    document.querySelector(".col-entry").textContent = `Entry (${currentCurrency})`;
+    document.querySelector(".col-sl").textContent = `Stop Loss (${currentCurrency})`;
+    document.querySelector(".col-target").textContent = `Target (${currentCurrency})`;
 
     // Update stats
     document.getElementById("statCandidates").textContent = data.count || 0;
@@ -172,10 +180,10 @@ function renderResults(candidates) {
             <td class="col-industry"><span class="cell-industry">${c.industry}</span></td>
             <td class="col-chart"><canvas id="${canvasId}" class="sparkline-canvas" width="110" height="36"></canvas></td>
             <td class="col-score" style="text-align:center"><span class="score-badge ${scoreClass}" onclick="toggleBreakdown('${c.symbol}')" title="Click to see score breakdown">${c.score}</span></td>
-            <td class="col-price" style="text-align:right"><span class="cell-price">₹${c.latest.close.toFixed(2)}</span></td>
-            <td class="col-entry" style="text-align:right"><span class="cell-entry">₹${c.levels.entry.toFixed(2)}</span></td>
-            <td class="col-sl" style="text-align:right"><span class="cell-sl">₹${c.levels.stop_loss.toFixed(2)}</span></td>
-            <td class="col-target" style="text-align:right"><span class="cell-target">₹${c.levels.primary_target.toFixed(2)}</span></td>
+            <td class="col-price" style="text-align:right"><span class="cell-price">${currentCurrency}${c.latest.close.toFixed(2)}</span></td>
+            <td class="col-entry" style="text-align:right"><span class="cell-entry">${currentCurrency}${c.levels.entry.toFixed(2)}</span></td>
+            <td class="col-sl" style="text-align:right"><span class="cell-sl">${currentCurrency}${c.levels.stop_loss.toFixed(2)}</span></td>
+            <td class="col-target" style="text-align:right"><span class="cell-target">${currentCurrency}${c.levels.primary_target.toFixed(2)}</span></td>
             <td class="col-rr" style="text-align:center"><span class="cell-rr">${c.levels.risk_reward.toFixed(1)}</span></td>
             <td class="col-signals">${signalHTML}</td>
             <td class="col-rsi" style="text-align:center"><span class="rsi-value ${rsiClass}">${c.latest.rsi ? c.latest.rsi.toFixed(0) : "—"}</span></td>

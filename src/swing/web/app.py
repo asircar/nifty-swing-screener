@@ -142,11 +142,13 @@ async def scan(market: str = "nifty_500", max_stocks: int | None = None):
     candidates = rank_candidates(candidates)
 
     # Build response and cache it
+    currency = "$" if market in us_markets else "₹"
     response_data = {
         "candidates": candidates,
         "stats": stats,
         "count": len(candidates),
         "market": market,
+        "currency": currency,
     }
 
     scanned_at = save_scan_results(cache_key, response_data)
