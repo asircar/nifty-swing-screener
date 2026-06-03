@@ -10,6 +10,9 @@ FALLBACK_CSV = DATA_DIR / "nifty500_fallback.csv"
 NIFTY50_FALLBACK_CSV = DATA_DIR / "nifty50_fallback.csv"
 NIFTY100_FALLBACK_CSV = DATA_DIR / "nifty100_fallback.csv"
 NIFTY200_FALLBACK_CSV = DATA_DIR / "nifty200_fallback.csv"
+SP500_FALLBACK_CSV = DATA_DIR / "sp500_fallback.csv"
+DOW30_FALLBACK_CSV = DATA_DIR / "dow30_fallback.csv"
+NASDAQ100_FALLBACK_CSV = DATA_DIR / "nasdaq100_fallback.csv"
 
 # ──────────────────────────── Data ─────────────────────────────
 NIFTY50_CSV_URL = (

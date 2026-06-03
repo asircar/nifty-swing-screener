@@ -1,0 +1,31 @@
+symbol,company,industry,yf_ticker
+MMM,3M,Industrials,MMM
+AXP,American Express,Financials,AXP
+AMGN,Amgen,Health Care,AMGN
+AMZN,Amazon,Consumer Discretionary,AMZN
+AAPL,Apple,Information Technology,AAPL
+BA,Boeing,Industrials,BA
+CAT,Caterpillar,Industrials,CAT
+CVX,Chevron,Energy,CVX
+CSCO,Cisco,Information Technology,CSCO
+KO,Coca-Cola,Consumer Staples,KO
+DIS,Disney,Communication Services,DIS
+GS,Goldman Sachs,Financials,GS
+HD,Home Depot,Consumer Discretionary,HD
+HON,Honeywell,Industrials,HON
+IBM,IBM,Information Technology,IBM
+JNJ,Johnson & Johnson,Health Care,JNJ
+JPM,JPMorgan Chase,Financials,JPM
+MCD,McDonald's,Consumer Discretionary,MCD
+MRK,Merck,Health Care,MRK
+MSFT,Microsoft,Information Technology,MSFT
+NKE,Nike,Consumer Discretionary,NKE
+NVDA,Nvidia,Information Technology,NVDA
+PG,Procter & Gamble,Consumer Staples,PG
+CRM,Salesforce,Information Technology,CRM
+SHW,Sherwin-Williams,Materials,SHW
+TRV,"Travelers Companies, Inc.",Financials,TRV
+UNH,UnitedHealth Group,Health Care,UNH
+VZ,Verizon,Communication Services,VZ
+V,Visa,Financials,V
+WMT,Walmart,Consumer Staples,WMT

@@ -27,23 +27,39 @@ def _download_index_csv(csv_url: str) -> str | None:
     """Download an index constituent CSV from NSE India."""
     headers = {
         "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
+            "Chrome/124.0.0.0 Safari/537.36"
         ),
         "Accept": "text/csv,text/plain,*/*",
+        "Accept-Language": "en-US,en;q=0.9",
         "Referer": "https://www.nseindia.com/",
     }
+
+    # Attempt 1: direct request — works when the CDN doesn't require session cookies
+    try:
+        with httpx.Client(timeout=20, follow_redirects=True) as client:
+            resp = client.get(csv_url, headers=headers)
+            if resp.status_code == 200 and "Symbol" in resp.text:
+                return resp.text
+    except Exception as exc:
+        log.debug("Direct NSE download failed (%s): %s", csv_url, exc)
+
+    # Attempt 2: establish a session with the NSE homepage first (gets cookies)
     try:
         with httpx.Client(timeout=30, follow_redirects=True) as client:
-            # Hit NSE homepage first to get cookies
-            client.get("https://www.nseindia.com/", headers=headers)
+            try:
+                client.get("https://www.nseindia.com/", headers=headers, timeout=15)
+            except Exception:
+                pass  # non-fatal — proceed without session cookies
             resp = client.get(csv_url, headers=headers)
             resp.raise_for_status()
-            return resp.text
+            if "Symbol" in resp.text:
+                return resp.text
     except Exception as exc:
         log.warning("Failed to download CSV from NSE (%s): %s", csv_url, exc)
-        return None
+
+    return None
 
 
 def _parse_csv_text(csv_text: str) -> list[dict]:

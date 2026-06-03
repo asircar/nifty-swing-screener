@@ -1,0 +1,102 @@
+symbol,company,industry,yf_ticker
+ADBE,Adobe Inc.,,ADBE
+AMD,Advanced Micro Devices,,AMD
+ABNB,Airbnb,,ABNB
+ALNY,Alnylam Pharmaceuticals,,ALNY
+GOOGL,Alphabet Inc. (Class A),,GOOGL
+GOOG,Alphabet Inc. (Class C),,GOOG
+AMZN,Amazon,,AMZN
+AEP,American Electric Power,,AEP
+AMGN,Amgen,,AMGN
+ADI,Analog Devices,,ADI
+AAPL,Apple Inc.,,AAPL
+AMAT,Applied Materials,,AMAT
+APP,AppLovin,,APP
+ARM,Arm Holdings,,ARM
+ASML,ASML Holding,,ASML
+ADSK,Autodesk,,ADSK
+ADP,Automatic Data Processing,,ADP
+AXON,Axon Enterprise,,AXON
+BKR,Baker Hughes,,BKR
+BKNG,Booking Holdings,,BKNG
+AVGO,Broadcom,,AVGO
+CDNS,Cadence Design Systems,,CDNS
+CHTR,Charter Communications,,CHTR
+CTAS,Cintas,,CTAS
+CSCO,Cisco,,CSCO
+CCEP,Coca-Cola Europacific Partners,,CCEP
+CTSH,Cognizant,,CTSH
+CMCSA,Comcast,,CMCSA
+CEG,Constellation Energy,,CEG
+CPRT,Copart,,CPRT
+COST,Costco,,COST
+CRWD,CrowdStrike,,CRWD
+CSX,CSX Corporation,,CSX
+DDOG,Datadog,,DDOG
+DXCM,DexCom,,DXCM
+FANG,Diamondback Energy,,FANG
+DASH,DoorDash,,DASH
+EA,Electronic Arts,,EA
+EXC,Exelon,,EXC
+FAST,Fastenal,,FAST
+FER,Ferrovial,,FER
+FTNT,Fortinet,,FTNT
+GEHC,GE HealthCare,,GEHC
+GILD,Gilead Sciences,,GILD
+HON,Honeywell,,HON
+IDXX,Idexx Laboratories,,IDXX
+INSM,Insmed Incorporated,,INSM
+INTC,Intel,,INTC
+INTU,Intuit,,INTU
+ISRG,Intuitive Surgical,,ISRG
+KDP,Keurig Dr Pepper,,KDP
+KLAC,KLA Corporation,,KLAC
+KHC,Kraft Heinz,,KHC
+LRCX,Lam Research,,LRCX
+LIN,Linde plc,,LIN
+LITE,Lumentum,,LITE
+MAR,Marriott International,,MAR
+MRVL,Marvell Technology,,MRVL
+MELI,Mercado Libre,,MELI
+META,Meta Platforms,,META
+MCHP,Microchip Technology,,MCHP
+MU,Micron Technology,,MU
+MSFT,Microsoft,,MSFT
+MSTR,MicroStrategy,,MSTR
+MDLZ,Mondelez International,,MDLZ
+MPWR,Monolithic Power Systems,,MPWR
+MNST,Monster Beverage,,MNST
+NFLX,"Netflix, Inc.",,NFLX
+NVDA,Nvidia,,NVDA
+NXPI,NXP Semiconductors,,NXPI
+ORLY,O'Reilly Automotive,,ORLY
+ODFL,Old Dominion Freight Line,,ODFL
+PCAR,Paccar,,PCAR
+PLTR,Palantir Technologies,,PLTR
+PANW,Palo Alto Networks,,PANW
+PAYX,Paychex,,PAYX
+PYPL,PayPal,,PYPL
+PDD,PDD Holdings,,PDD
+PEP,PepsiCo,,PEP
+QCOM,Qualcomm,,QCOM
+REGN,Regeneron Pharmaceuticals,,REGN
+ROP,Roper Technologies,,ROP
+ROST,Ross Stores,,ROST
+SNDK,Sandisk,,SNDK
+STX,Seagate Technology,,STX
+SHOP,Shopify,,SHOP
+SBUX,Starbucks,,SBUX
+SNPS,Synopsys,,SNPS
+TMUS,T-Mobile US,,TMUS
+TTWO,Take-Two Interactive,,TTWO
+TSLA,"Tesla, Inc.",,TSLA
+TXN,Texas Instruments,,TXN
+TRI,Thomson Reuters,,TRI
+VRSK,Verisk Analytics,,VRSK
+VRTX,Vertex Pharmaceuticals,,VRTX
+WMT,Walmart,,WMT
+WBD,Warner Bros. Discovery,,WBD
+WDC,Western Digital,,WDC
+WDAY,"Workday, Inc.",,WDAY
+XEL,Xcel Energy,,XEL
+ZS,Zscaler,,ZS
