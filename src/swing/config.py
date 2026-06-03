@@ -3,16 +3,22 @@
 from pathlib import Path
 
 # ──────────────────────────── Paths ────────────────────────────
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
-DB_PATH = DATA_DIR / "cache.db"
-FALLBACK_CSV = DATA_DIR / "nifty500_fallback.csv"
-NIFTY50_FALLBACK_CSV = DATA_DIR / "nifty50_fallback.csv"
-NIFTY100_FALLBACK_CSV = DATA_DIR / "nifty100_fallback.csv"
-NIFTY200_FALLBACK_CSV = DATA_DIR / "nifty200_fallback.csv"
-SP500_FALLBACK_CSV = DATA_DIR / "sp500_fallback.csv"
-DOW30_FALLBACK_CSV = DATA_DIR / "dow30_fallback.csv"
-NASDAQ100_FALLBACK_CSV = DATA_DIR / "nasdaq100_fallback.csv"
+# Fallback CSVs are bundled inside the package so they're available
+# both in development (editable install) and on deployed servers
+# (regular pip install where __file__ resolves to site-packages).
+_PKG_DATA = Path(__file__).resolve().parent / "data"
+
+# Writable cache lives in /tmp so it works on read-only deployed filesystems.
+_CACHE_DIR = Path("/tmp") / "swing"
+
+DB_PATH = _CACHE_DIR / "cache.db"
+FALLBACK_CSV = _PKG_DATA / "nifty500_fallback.csv"
+NIFTY50_FALLBACK_CSV = _PKG_DATA / "nifty50_fallback.csv"
+NIFTY100_FALLBACK_CSV = _PKG_DATA / "nifty100_fallback.csv"
+NIFTY200_FALLBACK_CSV = _PKG_DATA / "nifty200_fallback.csv"
+SP500_FALLBACK_CSV = _PKG_DATA / "sp500_fallback.csv"
+DOW30_FALLBACK_CSV = _PKG_DATA / "dow30_fallback.csv"
+NASDAQ100_FALLBACK_CSV = _PKG_DATA / "nasdaq100_fallback.csv"
 
 # ──────────────────────────── Data ─────────────────────────────
 NIFTY50_CSV_URL = (
