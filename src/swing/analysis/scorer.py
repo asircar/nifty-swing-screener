@@ -72,8 +72,12 @@ def compute_score(signal_result: dict, levels: dict) -> dict:
         rsi_score = 40
         rsi_reason = f"RSI {rsi:.0f} — deeply oversold, may signal weakness"
     else:
-        rsi_score = max(0, 100 - (rsi - 70) * 5)
-        rsi_reason = f"RSI {rsi:.0f} — overbought territory"
+        if signals.get("ema_aligned"):
+            rsi_score = 100
+            rsi_reason = f"RSI {rsi:.0f} — overbought but supported by strong bullish trend"
+        else:
+            rsi_score = max(0, 100 - (rsi - 70) * 5)
+            rsi_reason = f"RSI {rsi:.0f} — overbought territory"
 
     # ── Weighted composite ──
     factors = [

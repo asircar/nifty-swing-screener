@@ -59,8 +59,10 @@ MIN_PRICE_US = 5.0             # $5 minimum (US)
 MIN_AVG_VOLUME = 100_000       # 100K shares/day
 
 # ──────────────────────────── Levels ───────────────────────────
-ATR_SL_MULTIPLIER = 1.5        # stop loss = entry − 1.5 × ATR
-MIN_RISK_REWARD = 2.0          # minimum risk:reward ratio
+ATR_SL_MULTIPLIER = 1.2        # stop loss = entry − 1.2 × ATR
+ATR_T1_MULTIPLIER = 1.5        # target 1 = entry + 1.5 × ATR
+ATR_T2_MULTIPLIER = 2.5        # target 2 = entry + 2.5 × ATR
+MIN_RISK_REWARD = 1.5          # minimum risk:reward ratio
 
 # ──────────────────────────── Scoring Weights ──────────────────
 SCORE_WEIGHTS = {

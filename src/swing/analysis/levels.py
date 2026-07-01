@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from swing.config import ATR_SL_MULTIPLIER, MIN_RISK_REWARD
+from swing.config import ATR_SL_MULTIPLIER, ATR_T1_MULTIPLIER, ATR_T2_MULTIPLIER, MIN_RISK_REWARD
 
 
 def compute_levels(signal_result: dict) -> dict | None:
@@ -14,15 +14,13 @@ def compute_levels(signal_result: dict) -> dict | None:
     Returns dict with:
         - entry: float
         - stop_loss: float
-        - target_1: float (2:1 RR)
-        - target_2: float (nearest resistance)
-        - risk: float (entry - stop_loss)
-        - reward: float (target_1 - entry)
+        - target_1: float
+        - target_2: float
+        - risk: float
+        - reward: float
         - risk_reward: float
     """
     latest = signal_result.get("latest", {})
-    supports = signal_result.get("supports", [])
-    resistances = signal_result.get("resistances", [])
 
     close = latest.get("close")
     atr = latest.get("atr")
@@ -31,45 +29,26 @@ def compute_levels(signal_result: dict) -> dict | None:
         return None
 
     # ── Entry ──
-    # Use close price, or snap to nearest support if very close
+    # Strictly use the closing price as entry point
     entry = close
-    for sup in reversed(supports):
-        if sup < close and (close - sup) / sup <= 0.01:
-            entry = sup
-            break
 
     # ── Stop Loss ──
-    # ATR-based: entry − 1.5 × ATR
-    atr_stop = entry - ATR_SL_MULTIPLIER * atr
-
-    # Cross-check with nearest support below entry
-    support_below = [s for s in supports if s < entry * 0.99]
-    if support_below:
-        nearest_support = support_below[-1]
-        # Use the tighter of ATR stop and just below support
-        support_stop = nearest_support * 0.995  # slight buffer below support
-        stop_loss = max(atr_stop, support_stop)  # tighter = higher
-    else:
-        stop_loss = atr_stop
+    # ATR-based: entry − 1.2 × ATR
+    stop_loss = entry - ATR_SL_MULTIPLIER * atr
 
     # ── Targets ──
     risk = entry - stop_loss
     if risk <= 0:
         return None
 
-    # Target 1: 2:1 risk-reward
-    target_1 = entry + MIN_RISK_REWARD * risk
+    # Target 1: Core Target (1.5 × ATR)
+    target_1 = entry + ATR_T1_MULTIPLIER * atr
 
-    # Target 2: nearest resistance above entry
-    resistance_above = [r for r in resistances if r > entry * 1.01]
-    target_2 = resistance_above[0] if resistance_above else target_1 * 1.02
+    # Target 2: Runner Target (2.5 × ATR)
+    target_2 = entry + ATR_T2_MULTIPLIER * atr
 
-    # Use the better target (resistance if it gives ≥ 2:1 RR)
-    if target_2 > target_1:
-        primary_target = target_2
-    else:
-        primary_target = target_1
-
+    # Primary Target is the Runner Target for risk-reward calculations
+    primary_target = target_2
     reward = primary_target - entry
     risk_reward = reward / risk if risk > 0 else 0
 

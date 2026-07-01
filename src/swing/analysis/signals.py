@@ -119,11 +119,12 @@ def detect_signals(df: pd.DataFrame, min_price: float = MIN_PRICE) -> dict:
                         support_bounce = True
                 break
 
-    # Signal 5: Volume Surge
+    # Signal 5: Volume Surge (requires a green day/positive close)
     volume_surge = bool(
         pd.notna(latest.get("Volume_SMA"))
         and latest["Volume_SMA"] > 0
         and latest["Volume"] >= VOLUME_SURGE_FACTOR * latest["Volume_SMA"]
+        and latest["Close"] > prev["Close"]
     )
 
     signals = {
