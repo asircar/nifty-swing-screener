@@ -15,6 +15,7 @@ venv/
 
 # Data & cache (generated at runtime)
 data/cache.db
+data/trade_log.csv
 
 # IDE
 .idea/
